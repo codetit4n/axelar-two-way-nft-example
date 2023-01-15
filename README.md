@@ -18,3 +18,8 @@ The two chains I am choosing are:
 So, the params 'Sender' contract will be on Avalanche and the params 'Receiver'/NFT ownership checker contract will be on Moonbase.
 
 Gas will be paid on the Source chain for both sides.
+
+To deploy the contracts for testing run:
+```bash
+npx hardhat run scripts/deploy.js
+```

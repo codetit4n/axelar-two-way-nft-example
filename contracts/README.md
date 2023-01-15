@@ -1,4 +1,4 @@
-### Contracts documentation
+# Contracts documentation
 
 There are 3 contracts here:
 1. LyncNftContract.sol : This is the test ERC721 contract which will be deployed on moonbase alpha chain. It is simple ERC721 contract with simple function to mint any amount of NFTs for testing.
