@@ -7,3 +7,14 @@ Deploy a normal contract on any chain which sends 3 params
 3. User address who is interacting 
 
 On the second chain, deploy an NFT contract, and with params coming from 1st chain check if the user address is the owner of the NFT and return true/false back to 1st chain.
+
+### Information regarding my implementation
+Testnet chains docs: https://docs.axelar.dev/dev/build/contract-addresses/testnet
+
+The two chains I am choosing are:
+1. Avalanche FUJI Testnet - Chain Id: 43113 - Source chain
+2. Moonbase Alpha testnet - Chain Id: 1287 - Destination chain
+
+So, the params 'Sender' contract will be on Avalanche and the params 'Receiver'/NFT ownership checker contract will be on Moonbase.
+
+Gas will be paid on the Source chain for both sides.
