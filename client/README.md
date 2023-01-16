@@ -1,3 +1,3 @@
-# Testing two way GMP App
+# Two Way GMP Testing
 
-This is to test the logic written on the smart contracts.
+This is a simple CRA (Create React App) to test the logic written on the smart contracts.

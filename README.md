@@ -23,3 +23,5 @@ To deploy the contracts for testing run:
 ```bash
 npx hardhat run scripts/deploy.js
 ```
+
+I have used the axelar SDK for estimating gas in the react app (client folder).

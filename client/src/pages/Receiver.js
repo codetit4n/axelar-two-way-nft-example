@@ -75,7 +75,11 @@ function Receiver() {
     }
 
     const [addrInputMint, setAddrInputMint] = useState(null)
+    const [txHash, setTxHash] = useState(null)
     const [addrInputChk, setAddrInputChk] = useState(null)
+    const [contractAddrInputChk, setContractAddrInputChk] = useState(null)
+    const [tokenIdInputChk, setTokenIdInputChk] = useState(null)
+    const [output, setOutput] = useState(null)
 
     const handleMint = async (e) => {
         e.preventDefault();
@@ -86,7 +90,8 @@ function Receiver() {
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner()
                 const contract = new ethers.Contract(deployment_info.TestNft.address, LyncNftContractJSON.abi, signer);
-                await contract.safeMint(addrInputMint);
+                const txn = await contract.safeMint(addrInputMint);
+                setTxHash(txn.hash);
             } catch (err) {
                 console.log(err);
             }
@@ -102,9 +107,36 @@ function Receiver() {
     const changeAddrInputChk = (e) => {
         setAddrInputChk(e.target.value)
     }
-    const handleCheckOwnership = (e) => {
+
+    const changeContractAddrInputChk = (e) => {
+        setContractAddrInputChk(e.target.value)
+    }
+
+    const changeTokenId = (e) => {
+        setTokenIdInputChk(e.target.value)
+    }
+    const handleCheckOwnership = async (e) => {
         e.preventDefault();
         setLoader(true);
+        const regex = /^0x[a-fA-F0-9]{40}$/
+        if (regex.test(contractAddrInputChk) && regex.test(addrInputChk)) {
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner()
+                const contract = new ethers.Contract(contractAddrInputChk, LyncNftContractJSON.abi, signer);
+                const getFromBlockchain = await contract.ownerOf(tokenIdInputChk);
+                if (getFromBlockchain.toLowerCase() === addrInputChk.toLowerCase()) {
+                    setOutput('YES')
+                } else {
+                    setOutput('NO')
+                }
+            } catch (err) {
+                setOutput('NO')
+                console.log(err);
+            }
+        } else {
+            alert('Invalid inputs!!!');
+        }
         setLoader(false);
     }
     // make sure you are on the right chain
@@ -122,15 +154,31 @@ function Receiver() {
             <h2>Mint NFT on Moonbase Alpha chain</h2>
             <form>
                 <input type="text" placeholder='Enter address' onChange={changeAddrInputMint} />
+                <br />
                 <input type="button" value="Mint" onClick={handleMint} />
+                <br />
+                {
+                    txHash ?
+                        <p>
+                            Txn:
+                            <a href={`https://moonbase.moonscan.io/tx/${txHash}`} target='_blank' rel="noreferrer">{txHash}</a>
+                        </p> :
+                        <></>
+                }
             </form>
             <hr />
             <h2>Check ownership of an NFT on this chain</h2>
             <form>
-                <input type="text" placeholder='Enter address' onChange={changeAddrInputChk} />
+                <input type="text" placeholder='Enter your address' onChange={changeAddrInputChk} />
+                <br />
+                <input type="text" placeholder='Enter NFT contract address' onChange={changeContractAddrInputChk} />
+                <br />
+                <input type="text" placeholder='Enter NFT token ID' onChange={changeTokenId} />
+                <br />
                 <input type="button" value="Check" onClick={handleCheckOwnership} />
+                <br />
+                <div className='output'>{output}</div>
             </form>
-            <hr />
         </>
 
     )
