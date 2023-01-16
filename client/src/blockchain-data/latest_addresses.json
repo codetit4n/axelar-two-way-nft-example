@@ -1,0 +1,14 @@
+{
+    "Sender": {
+        "address": "0x6704200A7dc176A6849C659298CBE62C2Dd5E146",
+        "Chain": "Avalanche"
+    },
+    "Receiver": {
+        "address": "0xf1285B5c54f43f334550cB30E865b669EBAa4DfF",
+        "Chain": "Moonbase"
+    },
+    "TestNft": {
+        "address": "0x5c347d24943160bB504971C0cdCc71b0be3d96db",
+        "Chain": "Moonbase"
+    }
+}

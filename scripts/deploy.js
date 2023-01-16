@@ -1,6 +1,7 @@
 const data = require('../testnets-data/testnet.json');
 const { getDefaultProvider, Wallet } = require('ethers');
 const { ethers } = require("hardhat");
+const fs = require('fs')
 
 async function main() {
   // Get wallet from private key
@@ -25,6 +26,24 @@ async function main() {
   const LyncNftABI = await ethers.getContractFactory('LyncNftContract');
   const nft_contract = await LyncNftABI.connect(accountOnMoonbase).deploy();
   console.log('LyncNftContract deployed to: ', nft_contract.address, ' on Moonbase Alpha chain');
+  const toStore = {
+    'Sender': {
+      'address': sender_contract.address.toString(),
+      'Chain': 'Avalanche'
+    },
+    'Receiver': {
+      'address': receiver_contract.address.toString(),
+      'Chain': 'Moonbase'
+    },
+    'TestNft': {
+      'address': nft_contract.address.toString(),
+      'Chain': 'Moonbase'
+    }
+  }
+  const toStoreStringified = JSON.stringify(toStore);
+  fs.writeFile("./client/src/blockchain-data/latest_addresses.json", toStoreStringified, function (err, result) {
+    if (err) console.log('error', err);
+  });
   console.log('Deployment complete...');
 }
 
