@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import './styles.css'
 import { ethers } from 'ethers';
 import deployment_info from '../blockchain-data/latest_addresses.json'
 import SenderJSON from '../blockchain-data/contracts/Sender.sol/Sender.json'
@@ -10,9 +11,8 @@ function Sender() {
 
     useEffect(() => {
         loadWeb3();
-        checkChain();
     }, [])
-    const checkChain = async () => {
+    const switchChain = async () => {
         try {
             await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
@@ -73,15 +73,16 @@ function Sender() {
         setLoader(false);
     }
 
-    if (loader) {
-        return <h1 style={{ 'textAlign': 'center' }}>Loading...</h1>
-    }
     // make sure you are on the right chain
     if (chainId != '43113' && currentAddress != null) {
-        return <h1 style={{ textAlign: 'center' }}>Please switch network to Avalanche FUJI testnet</h1>
+        switchChain()
+        return <h1>Please switch network to Avalanche FUJI testnet</h1>
+    }
+    if (loader) {
+        return <h1>Loading...</h1>
     }
     return (
-        <h1 style={{ 'textAlign': 'center' }}>Sender</h1>
+        <h1>Sender</h1>
     )
 }
 
