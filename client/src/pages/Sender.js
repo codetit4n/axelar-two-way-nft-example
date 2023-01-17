@@ -140,14 +140,18 @@ function Sender() {
     const handleCheckResponse = async (e) => {
         e.preventDefault();
         setLoader(true);
-        try {
-            let res = await contract.checkResponse(nonceInput);
-            if (res)
-                setResponse('TRUE = Ownership of NFT verified on Moonbase');
-            else
-                setResponse('FALSE = Not owner');
-        } catch (err) {
-            setResponse('No response for this nonce!!!')
+        if (nonceInput != null) {
+            try {
+                let res = await contract.checkResponse(nonceInput);
+                if (res)
+                    setResponse('TRUE = Ownership of NFT verified on Moonbase');
+                else
+                    setResponse('FALSE = Not owner');
+            } catch (err) {
+                setResponse('No response for this nonce!!!')
+            }
+        } else {
+            alert('Invalid input!!!')
         }
         setLoader(false);
     }

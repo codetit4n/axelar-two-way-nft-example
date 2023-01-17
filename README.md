@@ -25,3 +25,18 @@ npx hardhat run scripts/deploy.js
 ```
 
 I have used the axelar SDK for estimating gas in the react app (client folder).
+
+## To run the react app for testing
+
+Go inside the client folder:
+```bash
+cd client
+```
+Install node modules:
+```bash
+npm i
+```
+Run the app on localhost:
+```bash
+npm start
+```
