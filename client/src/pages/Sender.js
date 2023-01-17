@@ -3,7 +3,7 @@ import './styles.css'
 import { BigNumber, ethers } from 'ethers';
 import { AxelarQueryAPI, EvmChain, GasToken } from '@axelar-network/axelarjs-sdk'
 import deployment_info from '../blockchain-data/latest_addresses.json'
-import SenderJSON from '../blockchain-data/artifacts/contracts/Sender.sol/Sender.json'
+import SenderJSON from '../blockchain-data/hardhat-artifacts/contracts/Sender.sol/Sender.json'
 
 const sdk = new AxelarQueryAPI({
     environment: "testnet",
@@ -155,7 +155,7 @@ function Sender() {
         }
         setLoader(false);
     }
-    // make sure you are on the right chain
+    // eslint-disable-next-line
     if (chainId != '43113' && currentAddress != null) {
         switchChain()
         return <h1>Please switch network to Avalanche FUJI testnet</h1>

@@ -19,6 +19,12 @@ So, the params 'Sender' contract will be on Avalanche and the params 'Receiver'/
 
 Gas will be paid on the Source chain for both sides.
 
+### Latest addresses being used in the client
+
+- Sender contract (Avalanche FUJI chain): 0x124edb971F290A41055A0f98e9302878d5877829
+- Receiver contract (Moonbase Alpha chain): 0xB5d8196AE369930d0491504C2Bb869E2601635a6
+- TestNft contract (Moonbase Alpha chain): 0xAb37A337a1bB6925Ab0d8b084320F14AaD08A92f
+
 To deploy the contracts for testing run:
 ```bash
 npx hardhat run scripts/deploy.js

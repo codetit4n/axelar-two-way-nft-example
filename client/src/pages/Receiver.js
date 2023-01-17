@@ -3,7 +3,7 @@ import './styles.css'
 import { ethers } from 'ethers';
 import deployment_info from '../blockchain-data/latest_addresses.json';
 // import ReceiverJSON from '../blockchain-data/contracts/Receiver.sol/Receiver.json'
-import LyncNftContractJSON from '../blockchain-data/artifacts/contracts/LyncNftContract.sol/LyncNftContract.json'
+import LyncNftContractJSON from '../blockchain-data/hardhat-artifacts/contracts/LyncNftContract.sol/LyncNftContract.json'
 
 function Receiver() {
     const [loader, setLoader] = useState(false);
@@ -139,7 +139,7 @@ function Receiver() {
         }
         setLoader(false);
     }
-    // make sure you are on the right chain
+    // eslint-disable-next-line
     if (chainId != '1287' && currentAddress != null) {
         switchChain();
         return <h1>Please switch network to Moonbase Alpha testnet</h1>
