@@ -3,7 +3,7 @@ import './styles.css'
 import { ethers } from 'ethers';
 import deployment_info from '../blockchain-data/latest_addresses.json';
 // import ReceiverJSON from '../blockchain-data/contracts/Receiver.sol/Receiver.json'
-import LyncNftContractJSON from '../blockchain-data/contracts/LyncNftContract.sol/LyncNftContract.json'
+import LyncNftContractJSON from '../blockchain-data/artifacts/contracts/LyncNftContract.sol/LyncNftContract.json'
 
 function Receiver() {
     const [loader, setLoader] = useState(false);

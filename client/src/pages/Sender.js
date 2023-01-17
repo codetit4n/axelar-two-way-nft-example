@@ -3,7 +3,7 @@ import './styles.css'
 import { BigNumber, ethers } from 'ethers';
 import { AxelarQueryAPI, EvmChain, GasToken } from '@axelar-network/axelarjs-sdk'
 import deployment_info from '../blockchain-data/latest_addresses.json'
-import SenderJSON from '../blockchain-data/contracts/Sender.sol/Sender.json'
+import SenderJSON from '../blockchain-data/artifacts/contracts/Sender.sol/Sender.json'
 
 const sdk = new AxelarQueryAPI({
     environment: "testnet",
@@ -61,7 +61,7 @@ function Sender() {
             window.location.reload()
         })
     }, [])
-
+    const [currentNonce, setCurrentNonce] = useState(null)
     const loadWeb3 = async () => {
         setLoader(true);
         try {
@@ -72,12 +72,15 @@ function Sender() {
             setChainId(network.chainId)
             const signer = provider.getSigner()
             setAddress(await signer.getAddress())
+            const _contract = new ethers.Contract(deployment_info.Sender.address, SenderJSON.abi, signer);
+            setContract(_contract)
+            setCurrentNonce(await _contract.nonce());
         } catch (err) {
             console.log(err);
         }
         setLoader(false);
     }
-
+    // console.log(currentNonce);
     const [contractAddr, setContractAddr] = useState(null)
     const [tokenId, setTokenId] = useState(null)
     const [txHash, setTxHash] = useState(null)
@@ -93,37 +96,58 @@ function Sender() {
     const handleSubmitTxn = async (e) => {
         e.preventDefault();
         setLoader(true);
-        try {
-            // Estimate gas needed using SDK
-            const estimateGasUsed = 700000;
-            const gasAmountSource = await sdk.estimateGasFee(
-                EvmChain.AVALANCHE,
-                EvmChain.MOONBEAM,
-                GasToken.AVAX,
-                estimateGasUsed
-            );
-            const gasAmountRemote = await sdk.estimateGasFee(
-                EvmChain.MOONBEAM,
-                EvmChain.AVALANCHE,
-                GasToken.AVAX,
-                estimateGasUsed
-            );
+        const regex = /^0x[a-fA-F0-9]{40}$/
+        if (regex.test(contractAddr) && tokenId != null) {
+            try {
+                // Estimate gas needed using SDK
+                const estimateGasUsed = 700000;
+                const gasAmountSource = await sdk.estimateGasFee(
+                    EvmChain.AVALANCHE,
+                    EvmChain.MOONBEAM,
+                    GasToken.AVAX,
+                    estimateGasUsed
+                );
+                const gasAmountRemote = await sdk.estimateGasFee(
+                    EvmChain.MOONBEAM,
+                    EvmChain.AVALANCHE,
+                    GasToken.AVAX,
+                    estimateGasUsed
+                );
+                // Transaction
+                const src = BigNumber.from(gasAmountSource)
+                const rem = BigNumber.from(gasAmountRemote)
+                const sum = src.add(rem);
+                const txn = await contract.sendContractCall('Moonbeam', deployment_info.Receiver.address, contractAddr, tokenId, gasAmountRemote, {
+                    value: sum
+                })
+                setTxHash(txn.hash);
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            alert('Invalid inputs!!!')
+        }
+        setLoader(false);
+    }
 
-            // Create payload
-            const payload = ethers.utils.defaultAbiCoder.encode(['string'], ['Hello Lokesh here!'])
-            // Transaction
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner()
-            const contract = new ethers.Contract(deployment_info.Sender.address, SenderJSON.abi, signer);
-            const src = BigNumber.from(gasAmountSource)
-            const rem = BigNumber.from(gasAmountRemote)
-            const sum = src.add(rem);
-            const txn = await contract.sendContractCall('Moonbeam', deployment_info.Receiver.address, payload, gasAmountRemote, {
-                value: sum
-            })
-            setTxHash(txn.hash);
+    const [nonceInput, setNonceInput] = useState(null)
+    const [response, setResponse] = useState(null)
+    const [contract, setContract] = useState(null)
+
+    const changeNonceInput = (e) => {
+        setNonceInput(e.target.value);
+    }
+    const handleCheckResponse = async (e) => {
+        e.preventDefault();
+        setLoader(true);
+        try {
+            let res = await contract.checkResponse(nonceInput);
+            if (res)
+                setResponse('TRUE = Ownership of NFT verified on Moonbase');
+            else
+                setResponse('FALSE = Not owner');
         } catch (err) {
-            console.log(err);
+            setResponse('No response for this nonce!!!')
         }
         setLoader(false);
     }
@@ -139,7 +163,12 @@ function Sender() {
         <>
             <h1>Avalanche FUJI Chain</h1>
             <hr />
-            <h2>Test Two Way GMP on Axelar</h2>
+            <h3>Test Two Way GMP on Axelar</h3>
+            {
+                currentNonce ?
+                    'Current Nonce: ' + currentNonce.toString() + ' (this will be assigned to your transaction)' :
+                    ''
+            }
             <form>
                 <input type="text" value={`Address: ${currentAddress}`} disabled />
                 <br />
@@ -157,6 +186,14 @@ function Sender() {
                         </p> :
                         <></>
                 }
+            </form>
+            <hr />
+            <h3>Check response from Moonbase</h3>
+            <form>
+                <input type="text" placeholder='Enter assigned nonce for GMP' onChange={changeNonceInput} />
+                <br />
+                <input type="button" value="Check" onClick={handleCheckResponse} />
+                <div className='output'>{response}</div>
             </form>
         </>
     )

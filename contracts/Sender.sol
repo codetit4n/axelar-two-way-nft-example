@@ -27,6 +27,7 @@ contract Sender is AxelarExecutable {
 
     uint256 public nonce;
     mapping(uint256 => bool) public executed;
+    mapping(uint256 => bool) responses;
     mapping(uint256 => bytes32) public destination;
     IAxelarGasService public immutable gasReceiver;
     string public thisChain;
@@ -50,12 +51,15 @@ contract Sender is AxelarExecutable {
     function sendContractCall(
         string calldata destinationChain,
         string calldata contractAddress,
-        bytes calldata payload,
+        address nftAddr,
+        uint256 tokenId,
         uint256 gasForRemote
     ) external payable {
         uint256 nonce_ = nonce;
+        // make payload
+        bytes memory payload = abi.encode(msg.sender, nftAddr, tokenId);
+        // encode payload with nonce
         bytes memory modifiedPayload = abi.encode(nonce_, payload);
-
         if (gasForRemote > 0) {
             if (gasForRemote > msg.value) revert NotEnoughValueForGas();
             gasReceiver.payNativeGasForContractCall{value: gasForRemote}(
@@ -101,7 +105,7 @@ contract Sender is AxelarExecutable {
         string calldata sourceAddress,
         bytes calldata payload
     ) internal override {
-        uint256 nonce_ = abi.decode(payload, (uint256));
+        (uint256 nonce_, bool isOwner) = abi.decode(payload, (uint256, bool));
         if (
             destination[nonce_] !=
             _getDestinationHash(sourceChain, sourceAddress)
@@ -110,7 +114,16 @@ contract Sender is AxelarExecutable {
             return;
         }
         executed[nonce_] = true;
-        //get some gas back.
         destination[nonce_] = 0;
+        // store response regarding ownership of NFT from reciever
+        responses[nonce_] = isOwner;
+    }
+
+    function checkResponse(uint256 nonce_) public view returns (bool res) {
+        if (executed[nonce_] == true) {
+            res = responses[nonce_];
+        } else {
+            revert("No response yet!!!");
+        }
     }
 }

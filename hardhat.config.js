@@ -5,6 +5,6 @@ require('dotenv').config();
 module.exports = {
   solidity: "0.8.17",
   paths: {
-    artifacts: './client/src/blockchain-data'
+    artifacts: './client/src/blockchain-data/artifacts'
   }
 };
