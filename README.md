@@ -1,4 +1,6 @@
-# axelar-two-way-nft-example
+# axelar-two-way-nft-example - Archived
+> **Warning**
+> This is a public archived repository. Some things might not work!
 
 ## Task
 Deploy a normal contract on any chain which sends 3 params
